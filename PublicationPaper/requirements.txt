@@ -1,0 +1,8 @@
+streamlit>=1.25.0
+langgraph
+langchain
+openai
+python-dotenv
+pyvis
+httpx
+pandas
