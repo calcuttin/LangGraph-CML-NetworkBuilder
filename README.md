@@ -72,7 +72,7 @@ pip install streamlit langgraph langchain openai python-dotenv pyvis httpx
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/yourusername/LangGraph-CML-NetworkBuilder.git
+   git clone https://github.com/calcuttin/LangGraph-CML-NetworkBuilder.git
    cd LangGraph-CML-NetworkBuilder
    ```
 
