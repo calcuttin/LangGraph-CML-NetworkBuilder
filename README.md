@@ -1,12 +1,19 @@
-# 🧠💻 LangGraph CML Network Builder
+<p align="center">
+  <img src="./assets/graph2lab_logo.png" alt="Graph2Lab Logo" width="200"/>
+</p>
+
+# 🧠🧪 Graph2Lab: Your AI-Powered Network Lab Assistant
 
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python)
 ![Streamlit](https://img.shields.io/badge/built_with-Streamlit-ff4b4b?logo=streamlit)
+![LangGraph](https://img.shields.io/badge/langgraph-integrated-blueviolet)
+![CML](https://img.shields.io/badge/cisco-modeling%20labs-lightgrey?logo=cisco)
 ![License](https://img.shields.io/badge/license-MIT-green?logo=open-source-initiative)
+![Skippy Approved](https://img.shields.io/badge/AI-sidekick%20approved-blueviolet?style=flat-square&logo=github)
 
-This project is an **interactive AI-assisted network design and deployment tool** built with [Streamlit](https://streamlit.io/), [LangGraph](https://github.com/langchain-ai/langgraph), and Cisco Modeling Labs (CML). It enables network engineers to **describe**, **customize**, and **deploy** topologies to CML using natural language and AI-driven automation.
+*Graph2Lab* is an AI-powered assistant for building, customizing, and deploying network labs into Cisco Modeling Labs (CML). It combines LangGraph, Streamlit, and OpenAI to turn natural language topology requests into real-time, visualized, and deployable CML labs.
 
-![screenshot](./assets/demo-topology.png)
+Whether you're prototyping CCNA/CCNP topologies or managing enterprise-scale lab simulations, Graph2Lab helps streamline the process with automation, clarity, and control.
 
 ---
 

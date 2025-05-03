@@ -1,0 +1,68 @@
+{
+    "network_design": {
+        "devices": [
+            {
+                "name": "Router A",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 100,
+                "config": "hostname Router A\ninterface GigabitEthernet0/0\n ip address 10.0.0.1 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.5 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "Router B",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 300,
+                "y": 100,
+                "config": "hostname Router B\ninterface GigabitEthernet0/0\n ip address 10.0.0.2 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.9 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "Router C",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 500,
+                "y": 100,
+                "config": "hostname Router C\ninterface GigabitEthernet0/0\n ip address 10.0.0.6 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.13 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "Router D",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 300,
+                "config": "hostname Router D\ninterface GigabitEthernet0/0\n ip address 10.0.0.10 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.14 255.255.255.252\n no shutdown"
+            }
+        ],
+        "links": [
+            {
+                "endpoints": [
+                    "Router A",
+                    "Router B"
+                ],
+                "link_type": "serial"
+            },
+            {
+                "endpoints": [
+                    "Router A",
+                    "Router C"
+                ],
+                "link_type": "serial"
+            },
+            {
+                "endpoints": [
+                    "Router B",
+                    "Router D"
+                ],
+                "link_type": "serial"
+            },
+            {
+                "endpoints": [
+                    "Router C",
+                    "Router D"
+                ],
+                "link_type": "serial"
+            }
+        ]
+    }
+}

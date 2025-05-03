@@ -1,0 +1,45 @@
+
+<style>
+.flowchart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+.flowchart-step {
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 12px 24px;
+    margin: 8px 0;
+    width: 320px;
+    text-align: center;
+    font-size: 16px;
+    position: relative;
+}
+.phase-prep { background-color: #e3f2fd; }
+.phase-config { background-color: #e8f5e9; }
+.phase-deploy { background-color: #fff3e0; }
+.phase-run { background-color: #ede7f6; }
+.flowchart-step::after {
+    content: "↓";
+    position: absolute;
+    left: 50%;
+    bottom: -20px;
+    transform: translateX(-50%);
+    font-size: 18px;
+}
+.flowchart-step:last-child::after {
+    content: "";
+}
+</style>
+<div class="flowchart-container" id="flowchart">
+    <div class="flowchart-step phase-prep">MCP Model Ready</div>
+    <div class="flowchart-step phase-prep">Assign Templates & Positions</div>
+    <div class="flowchart-step phase-config">Connect to CML Server</div>
+    <div class="flowchart-step phase-config">Create New Lab ID</div>
+    <div class="flowchart-step phase-config">Add Nodes (Routers/Switches/PCs)</div>
+    <div class="flowchart-step phase-config">Add Links (WAN/LAN)</div>
+    <div class="flowchart-step phase-config">Customize IPs & VLANs</div>
+    <div class="flowchart-step phase-deploy">Deploy to CML</div>
+    <div class="flowchart-step phase-run">Lab Running!</div>
+</div>

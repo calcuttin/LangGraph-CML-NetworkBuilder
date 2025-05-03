@@ -1,0 +1,83 @@
+{
+    "network_design": {
+        "devices": [
+            {
+                "name": "R1",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 100,
+                "config": "hostname R1\ninterface GigabitEthernet0/0\n ip address 10.0.0.1 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.18 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R2",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 300,
+                "y": 100,
+                "config": "hostname R2\ninterface GigabitEthernet0/0\n ip address 10.0.0.2 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.5 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R3",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 500,
+                "y": 100,
+                "config": "hostname R3\ninterface GigabitEthernet0/0\n ip address 10.0.0.6 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.9 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R4",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 300,
+                "config": "hostname R4\ninterface GigabitEthernet0/0\n ip address 10.0.0.10 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.13 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R5",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 300,
+                "y": 300,
+                "config": "hostname R5\ninterface GigabitEthernet0/0\n ip address 10.0.0.14 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.17 255.255.255.252\n no shutdown"
+            }
+        ],
+        "links": [
+            {
+                "endpoints": [
+                    "R1",
+                    "R2"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R2",
+                    "R3"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R3",
+                    "R4"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R4",
+                    "R5"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R5",
+                    "R1"
+                ],
+                "link_type": "ethernet"
+            }
+        ]
+    }
+}

@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 *.log
 .DS_Store
+saved_models/*
+custom_templates/*
+Frontend.py.backup
+logs/*

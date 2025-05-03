@@ -249,188 +249,6 @@ def assign_ip_addresses(devices, links, base_network="10.0.0.0/8", subnet_prefix
     
     return vxlan_enabled
 
-# --- Protocol Configuration Generator ---
-def generate_device_configs(devices, links, requested_protocol=None):
-    """
-    Generate device configurations based on the requested routing protocol.
-    
-    Args:
-        devices: List of device dictionaries
-        links: List of link dictionaries
-        requested_protocol: Routing protocol to configure (OSPF, EIGRP, BGP, STATIC)
-        
-    Returns:
-        Updated list of device dictionaries with configuration
-    """
-    if not requested_protocol:
-        return devices  # No protocol requested, return devices unchanged
-    
-    # Create a map of device names to their objects for easier lookup
-    device_map = {dev["name"]: dev for dev in devices}
-    
-    # Get connected networks for each device
-    device_networks = {}
-    for link in links:
-        if "subnet" in link:
-            subnet = link["subnet"]
-            endpoints = link.get("endpoints", [])
-            
-            # Add this subnet to each connected device's list
-            for endpoint in endpoints:
-                if endpoint in device_map:
-                    if endpoint not in device_networks:
-                        device_networks[endpoint] = []
-                    device_networks[endpoint].append(subnet)
-    
-    # Generate configs based on protocol
-    if requested_protocol == "OSPF":
-        # Use process ID 1 and area 0 for simplicity
-        process_id = 1
-        area = 0
-        
-        for dev_name, networks in device_networks.items():
-            if dev_name in device_map and device_map[dev_name]["type"] == "router":
-                device = device_map[dev_name]
-                
-                # Start with the device's existing config or create a basic one
-                if "config" not in device or not device["config"]:
-                    device["config"] = f"hostname {dev_name}\n"
-                
-                # Add OSPF configuration
-                ospf_config = [f"router ospf {process_id}"]
-                
-                # Add network statements for each connected subnet
-                for network in networks:
-                    if network:
-                        try:
-                            # Parse the subnet to get the network address and mask
-                            import ipaddress
-                            subnet_obj = ipaddress.IPv4Network(network, strict=False)
-                            network_addr = str(subnet_obj.network_address)
-                            wildcard = str(ipaddress.IPv4Address(int(subnet_obj.hostmask)))
-                            ospf_config.append(f" network {network_addr} {wildcard} area {area}")
-                        except Exception as e:
-                            # Fall back to simple format if parsing fails
-                            ospf_config.append(f" network {network} area {area}")
-                
-                # Append the OSPF config to the device config
-                device["config"] += "\n" + "\n".join(ospf_config)
-    
-    elif requested_protocol == "EIGRP":
-        # Use AS 100 for simplicity
-        as_number = 100
-        
-        for dev_name, networks in device_networks.items():
-            if dev_name in device_map and device_map[dev_name]["type"] == "router":
-                device = device_map[dev_name]
-                
-                # Start with the device's existing config or create a basic one
-                if "config" not in device or not device["config"]:
-                    device["config"] = f"hostname {dev_name}\n"
-                
-                # Add EIGRP configuration
-                eigrp_config = [f"router eigrp {as_number}"]
-                
-                # Add network statements for each connected subnet
-                for network in networks:
-                    if network:
-                        try:
-                            # Parse the subnet to get the network address
-                            import ipaddress
-                            subnet_obj = ipaddress.IPv4Network(network, strict=False)
-                            network_addr = str(subnet_obj.network_address)
-                            eigrp_config.append(f" network {network_addr}")
-                        except Exception as e:
-                            # Fall back to simple format if parsing fails
-                            eigrp_config.append(f" network {network}")
-                
-                eigrp_config.append(" no auto-summary")
-                
-                # Append the EIGRP config to the device config
-                device["config"] += "\n" + "\n".join(eigrp_config)
-    
-    elif requested_protocol == "BGP":
-        # Use ASN 65000 for simplicity
-        asn = 65000
-        
-        for dev_name, networks in device_networks.items():
-            if dev_name in device_map and device_map[dev_name]["type"] == "router":
-                device = device_map[dev_name]
-                
-                # Start with the device's existing config or create a basic one
-                if "config" not in device or not device["config"]:
-                    device["config"] = f"hostname {dev_name}\n"
-                
-                # Get router ID from first interface if possible
-                router_id = None
-                if "interfaces" in device:
-                    for iface in device["interfaces"]:
-                        if "ip" in iface and iface["ip"]:
-                            router_id = iface["ip"]
-                            break
-                
-                # Add BGP configuration
-                bgp_config = [f"router bgp {asn}"]
-                if router_id:
-                    bgp_config.append(f" bgp router-id {router_id}")
-                
-                # Add network statements for each connected subnet
-                for network in networks:
-                    if network:
-                        try:
-                            # Parse the subnet to get the network address and mask
-                            import ipaddress
-                            subnet_obj = ipaddress.IPv4Network(network, strict=False)
-                            network_addr = str(subnet_obj.network_address)
-                            mask = str(subnet_obj.netmask)
-                            bgp_config.append(f" network {network_addr} mask {mask}")
-                        except Exception as e:
-                            # Fall back to simpler format if parsing fails
-                            bgp_config.append(f" network {network}")
-                
-                # Append the BGP config to the device config
-                device["config"] += "\n" + "\n".join(bgp_config)
-                
-    elif requested_protocol == "STATIC":
-        # This is more complex and would require knowledge of the desired topology
-        # For now, just add a default route to each device pointing to the first connected device
-        for dev_name, networks in device_networks.items():
-            if dev_name in device_map and device_map[dev_name]["type"] == "router":
-                device = device_map[dev_name]
-                
-                # Start with the device's existing config or create a basic one
-                if "config" not in device or not device["config"]:
-                    device["config"] = f"hostname {dev_name}\n"
-                
-                # Find connected devices through links
-                connected_devices = []
-                for link in links:
-                    endpoints = link.get("endpoints", [])
-                    if dev_name in endpoints:
-                        # Get the other endpoint
-                        other_device = endpoints[0] if endpoints[1] == dev_name else endpoints[1]
-                        connected_devices.append(other_device)
-                
-                # Add static routes for demonstration
-                static_config = []
-                if connected_devices:
-                    # Get the next hop IP if possible
-                    next_hop = None
-                    if "interfaces" in device_map[connected_devices[0]]:
-                        for iface in device_map[connected_devices[0]]["interfaces"]:
-                            if "ip" in iface and iface["ip"]:
-                                next_hop = iface["ip"]
-                                break
-                    
-                    if next_hop:
-                        static_config.append(f"ip route 0.0.0.0 0.0.0.0 {next_hop}")
-                
-                # Append the static config to the device config
-                if static_config:
-                    device["config"] += "\n" + "\n".join(static_config)
-    
-    return devices
-
 # --- Logo helper for base64 encoding ---
 import base64
 from io import BytesIO
@@ -950,7 +768,6 @@ graph = builder.compile()
 
 from PIL import Image
 dark_mode = st.sidebar.toggle("🌙 Dark Mode", value=False)
-st.session_state['dark_mode_active'] = dark_mode # Store in session state
 
 # Global design mode toggle
 design_mode = st.sidebar.toggle("💡 Design Mode (Offline Templates)", value=False)
@@ -1293,13 +1110,19 @@ if template_choice != "Select...":
         st.session_state['last_mcp_model'] = selected_template
         st.success(f"✅ Template `{template_choice}` loaded into session. You can now deploy it!")
         
-        # Remove the visualization selector radio button
-        # viz_option = st.radio(...)
+        # Add the visualization selector
+        viz_option = st.radio(
+            "Visualization Type:",
+            ["Interactive (Plotly)", "Legacy (Pyvis)"],
+            horizontal=True,
+            index=0  # Default to Plotly
+        )
         
         with st.spinner("Rendering network diagram..."):
-            # Always call Plotly version, passing dark_mode
-            draw_network_topology_plotly(selected_template, dark_mode=st.session_state.get('dark_mode_active', False))
-            
+            if viz_option == "Interactive (Plotly)":
+                draw_network_topology_plotly(selected_template)
+            else:
+                draw_network_topology(selected_template)
         # --- Show device interface/IP table ---
         st.markdown("### Device Interface Details")
         for dev in devices:
@@ -1356,8 +1179,8 @@ if template_choice != "Select...":
                 if st.button("💾 Apply Edits to Devices (Chat)"):
                     mcp_model["network_design"]["devices"] = edited_devices
                     st.success("✅ Updated device configurations applied.")
-                    # Use Plotly for visualization, passing dark_mode
-                    draw_network_topology_plotly(mcp_model, dark_mode=st.session_state.get('dark_mode_active', False))
+                    # Use Plotly for visualization
+                    draw_network_topology_plotly(mcp_model)
                 if st.button("🔄 Reset Device Edits (Chat)"):
                     st.rerun()
             else:
@@ -1761,27 +1584,12 @@ if user_input:
                             
                             # Safety check before calling IP assignment
                             try:
-                                # Assign IPs first (modifies devices/links in-place if needed for VXLAN)
+                                # Add VXLAN features if needed
                                 vxlan_enabled = assign_ip_addresses(output.get("devices", []), output.get("links", []))
-
-                                # --- Generate Protocol Config --- 
-                                requested_protocol = output.get("protocol")
-                                if requested_protocol:
-                                    st.info(f"⚙️ Generating config for {requested_protocol}...")
-                                    # Get devices/links potentially modified by assign_ip_addresses
-                                    current_devices = output.get("devices", [])
-                                    current_links = output.get("links", [])
-                                    # Generate configs including the requested protocol
-                                    devices_with_config = generate_device_configs(current_devices, current_links, requested_protocol=requested_protocol)
-                                    # --- IMPORTANT: Update the model in session state --- 
-                                    network_model["network_design"]["devices"] = devices_with_config
-                                    st.session_state['last_mcp_model'] = network_model # Ensure session has updated devices
-                                    st.info(f"✅ {requested_protocol} config generated.")
-                                    
                                 if vxlan_enabled:
                                     st.info("🔄 VXLAN overlay configured with appropriate VTEPs and VNIs")
                             except Exception as e:
-                                st.error(f"❌ Error during IP/Config generation: {str(e)}")
+                                st.error(f"❌ Error assigning IP addresses: {str(e)}")
                             
                             # Format and add the response to chat history
                             st.session_state['chat_history'].append({
@@ -1795,13 +1603,19 @@ if user_input:
                             with tab1:
                                 st.success(f"✅ Network topology generated successfully!")
                                 
-                                # Remove the visualization selector radio button
-                                # viz_option = st.radio(...)
+                                # Add the visualization selector
+                                viz_option = st.radio(
+                                    "Visualization Type:",
+                                    ["Interactive (Plotly)", "Legacy (Pyvis)"],
+                                    horizontal=True,
+                                    index=0  # Default to Plotly
+                                )
                                 
                                 with st.spinner("Rendering network diagram..."):
-                                    # Always call Plotly version, passing dark_mode
-                                    draw_network_topology_plotly(network_model, dark_mode=st.session_state.get('dark_mode_active', False))
-                                    
+                                    if viz_option == "Interactive (Plotly)":
+                                        draw_network_topology_plotly(network_model)
+                                    else:
+                                        draw_network_topology(network_model)
                                 # Show device interface/IP table 
                                 st.markdown("### Device Interface Details")
                                 for dev in output["devices"]:
@@ -1824,9 +1638,8 @@ if user_input:
                                 # Device customization section
                                 if 'last_mcp_model' in st.session_state:
                                     current_model = st.session_state.get('last_mcp_model')
-                                    # Use devices directly from the current_model for consistency
-                                    devices_to_edit = current_model["network_design"].get("devices", [])
-                                    if devices_to_edit:
+                                    devices = current_model["network_design"].get("devices", [])
+                                    if devices:
                                         available_defs = {
                                             "router": "iosv",
                                             "switch": "iosvl2",
@@ -1840,15 +1653,12 @@ if user_input:
                                         }
                                         valid_types = list(available_defs.keys())
                                         node_definitions = available_defs
-                                        # Pass the devices from the model to the editor
-                                        edited_devices = edit_devices_ui(devices_to_edit, node_definitions, valid_types, context_prefix="generated")
+                                        edited_devices = edit_devices_ui(devices, node_definitions, valid_types, context_prefix="generated")
                                         if st.button("💾 Apply Edits to Devices", key="apply_edits_generated"):
-                                            # Update the model in session state directly
                                             current_model["network_design"]["devices"] = edited_devices
-                                            st.session_state['last_mcp_model'] = current_model # Update session state
                                             st.success("✅ Updated device configurations applied.")
-                                            # Use Plotly for visualization, passing dark_mode
-                                            draw_network_topology_plotly(current_model, dark_mode=st.session_state.get('dark_mode_active', False))
+                                            # Use Plotly for visualization
+                                            draw_network_topology_plotly(current_model)
                                         if st.button("🔄 Reset Device Edits", key="reset_edits_generated"):
                                             st.rerun()
                             
@@ -1856,13 +1666,12 @@ if user_input:
                                 st.markdown("### 📋 Deployment Summary")
                                 import re
                                 
-                                # Always use the model from session state for the summary
                                 if 'last_mcp_model' in st.session_state:
-                                    current_model_for_summary = st.session_state.get('last_mcp_model')
-                                    devices_for_summary = current_model_for_summary["network_design"].get("devices", [])
+                                    current_model = st.session_state.get('last_mcp_model')
+                                    devices = current_model["network_design"].get("devices", [])
                                     
-                                    if devices_for_summary:
-                                        summary_data = []  # List to hold all device summary rows
+                                    if devices:
+                                        summary_data = []
                                         
                                         def format_protocol_badges(protocol_list):
                                             badge_map = {
@@ -1873,8 +1682,7 @@ if user_input:
                                             }
                                             return ", ".join([badge_map.get(proto, proto) for proto in protocol_list])
                                         
-                                        # Process each device individually and add to summary_data
-                                        for dev in devices_for_summary:
+                                        for dev in devices:
                                             name = dev.get("name", "Unnamed")
                                             dev_type = dev.get("type", "unknown").title()
                                             definition = dev.get("node_definition", "iosv")
@@ -1901,9 +1709,10 @@ if user_input:
                                                     interfaces.append(f"{iface_name} ({ip})")
                                             
                                             # Detect protocol from the model
-                                            model_protocol = current_model_for_summary["network_design"].get("protocol")
-                                            if model_protocol and model_protocol not in protocols:
-                                                protocols.append(model_protocol)
+                                            if "protocol" in current_model["network_design"]:
+                                                proto = current_model["network_design"]["protocol"]
+                                                if proto:
+                                                    protocols.append(proto)
                                             
                                             # Parse config for VLANs, static routes, etc.
                                             if config:
@@ -1918,8 +1727,8 @@ if user_input:
                                                         ospf_area = stripped.split("area")[-1].strip()
                                                         ospf_networks.append(stripped.strip())
                                             
-                                            # Protocol detection from config (more reliable)
-                                            if "router ospf" in config:
+                                            # Protocol detection from config
+                                            if "router ospf" in config: 
                                                 if "OSPF" not in protocols:
                                                     protocols.append("OSPF")
                                             if "router eigrp" in config: 
@@ -1950,88 +1759,132 @@ if user_input:
                                             # --- Parse Static Routes ---
                                             static_routes = re.findall(r"ip route (\d+\.\d+\.\d+\.\d+) (\d+\.\d+\.\d+\.\d+) (\d+\.\d+\.\d+\.\d+)", config)
                                             static_route_lines = [f"{dest} {mask} {nh}" for dest, mask, nh in static_routes]
-                                            
-                                            # Build the row for THIS device
-                                            this_device_row = {
-                                                "Device": name,
-                                                "Type": dev_type,
-                                                "Image": definition,
-                                                "VLANs": ", ".join(sorted(vlans)) if vlans else "-",
-                                                "Protocols": format_protocol_badges(protocols) if protocols else "None",
-                                                "OSPF PID": ospf_pid,
-                                                "OSPF Area": ospf_area,
-                                                "OSPF Networks": "\n".join(ospf_networks) if ospf_networks else "-",
-                                                # Protocol fields
-                                                "EIGRP AS": eigrp_as,
-                                                "EIGRP Networks": "\n".join(eigrp_networks) if eigrp_networks else "-",
-                                                "BGP ASN": bgp_asn,
-                                                "BGP Neighbors": "\n".join(bgp_neighbors) if bgp_neighbors else "-",
-                                                "BGP Networks": "\n".join(bgp_networks) if bgp_networks else "-",
-                                                "Static Routes": "\n".join(static_route_lines) if static_route_lines else "-",
-                                            }
-                                            
-                                            # Add individual interface columns
-                                            for i in range(4):
-                                                this_device_row[f"Interface {i+1}"] = interfaces[i] if i < len(interfaces) else "-"
-                                            
-                                            # Add THIS device's row to the summary data
-                                            summary_data.append(this_device_row)
                                         
-                                        # Now outside the loop, process all collected rows
+                                        row = {
+                                            "Device": name,
+                                            "Type": dev_type,
+                                            "Image": definition,
+                                            "VLANs": ", ".join(sorted(vlans)) if vlans else "-",
+                                            "Protocols": format_protocol_badges(protocols) if protocols else "None",
+                                            "OSPF PID": ospf_pid,
+                                            "OSPF Area": ospf_area,
+                                            "OSPF Networks": "\n".join(ospf_networks) if ospf_networks else "-",
+                                            # Protocol fields
+                                            "EIGRP AS": eigrp_as,
+                                            "EIGRP Networks": "\n".join(eigrp_networks) if eigrp_networks else "-",
+                                            "BGP ASN": bgp_asn,
+                                            "BGP Neighbors": "\n".join(bgp_neighbors) if bgp_neighbors else "-",
+                                            "BGP Networks": "\n".join(bgp_networks) if bgp_networks else "-",
+                                            "Static Routes": "\n".join(static_route_lines) if static_route_lines else "-",
+                                        }
                                         
-                                        # Determine which protocol columns are relevant
-                                        include_ospf = any("OSPF" in row.get("Protocols", "") for row in summary_data)
-                                        include_eigrp = any("EIGRP" in row.get("Protocols", "") for row in summary_data)
-                                        include_bgp = any("BGP" in row.get("Protocols", "") for row in summary_data)
-                                        include_static = any("Static" in row.get("Protocols", "") for row in summary_data)
+                                        # Add individual interface columns
+                                        for i in range(4):
+                                            row[f"Interface {i+1}"] = interfaces[i] if i < len(interfaces) else "-"
                                         
-                                        # Drop unused protocol-specific fields
-                                        for row in summary_data:
-                                            if not include_ospf:
-                                                row.pop("OSPF PID", None)
-                                                row.pop("OSPF Area", None)
-                                                row.pop("OSPF Networks", None)
-                                            if not include_eigrp:
-                                                row.pop("EIGRP AS", None)
-                                                row.pop("EIGRP Networks", None)
-                                            if not include_bgp:
-                                                row.pop("BGP ASN", None)
-                                                row.pop("BGP Neighbors", None)
-                                                row.pop("BGP Networks", None)
-                                            if not include_static:
-                                                row.pop("Static Routes", None)
-                                        
-                                        # Display as dataframe
-                                        df_summary = pd.DataFrame(summary_data)
-                                        st.dataframe(df_summary, use_container_width=True)
-                                        
-                                        # --- Export & Print Options ---
-                                        st.markdown("#### 📤 Export & Print Options")
-                                        
-                                        col_export1, col_export2 = st.columns(2)
-                                        
-                                        with col_export1:
-                                            csv = df_summary.to_csv(index=False).encode("utf-8")
-                                            st.download_button(
-                                                label="📥 Export Summary to CSV",
-                                                data=csv,
-                                                file_name="deployment_summary.csv",
-                                                mime="text/csv"
-                                            )
-                                        
-                                        with col_export2:
-                                            st.button("🖨️ Print View", key="print_generated", on_click=lambda: st.markdown(
-                                                """
-                                                <script>
-                                                    window.print();
-                                                </script>
-                                                """,
-                                                unsafe_allow_html=True
-                                            ))
-                                    else:
-                                        st.info("No devices available in the topology.")
+                                        summary_data.append(row)
+                                    
+                                    # Determine which protocol columns are relevant
+                                    include_ospf = any("OSPF" in row.get("Protocols", "") for row in summary_data)
+                                    include_eigrp = any("EIGRP" in row.get("Protocols", "") for row in summary_data)
+                                    include_bgp = any("BGP" in row.get("Protocols", "") for row in summary_data)
+                                    include_static = any("Static" in row.get("Protocols", "") for row in summary_data)
+                                    
+                                    # Drop unused protocol-specific fields
+                                    for row in summary_data:
+                                        if not include_ospf:
+                                            row.pop("OSPF PID", None)
+                                            row.pop("OSPF Area", None)
+                                            row.pop("OSPF Networks", None)
+                                        if not include_eigrp:
+                                            row.pop("EIGRP AS", None)
+                                            row.pop("EIGRP Networks", None)
+                                        if not include_bgp:
+                                            row.pop("BGP ASN", None)
+                                            row.pop("BGP Neighbors", None)
+                                            row.pop("BGP Networks", None)
+                                        if not include_static:
+                                            row.pop("Static Routes", None)
+                                    
+                                    # Display as dataframe
+                                    df_summary = pd.DataFrame(summary_data)
+                                    st.dataframe(df_summary, use_container_width=True)
+                                    
+                                    # --- Export & Print Options ---
+                                    st.markdown("#### 📤 Export & Print Options")
+                                    
+                                    col_export1, col_export2 = st.columns(2)
+                                    
+                                    with col_export1:
+                                        csv = df_summary.to_csv(index=False).encode("utf-8")
+                                        st.download_button(
+                                            label="📥 Export Summary to CSV",
+                                            data=csv,
+                                            file_name="deployment_summary.csv",
+                                            mime="text/csv"
+                                        )
+                                    
+                                    with col_export2:
+                                        st.button("🖨️ Print View", key="print_generated", on_click=lambda: st.markdown(
+                                            """
+                                            <script>
+                                                window.print();
+                                            </script>
+                                            """,
+                                            unsafe_allow_html=True
+                                        ))
+                                else:
+                                    st.info("No devices available in the topology.")
                                 else:
                                     st.info("No topology loaded. Generate a topology first.")
+                            
+                            with tab4:
+                                st.markdown("### 🔍 Network Validation & Health Checks")
+                                if 'last_mcp_model' in st.session_state:
+                                    # Create validator instance
+                                    validator = NetworkValidator(
+                                        st.session_state['last_mcp_model']["network_design"]["devices"],
+                                        st.session_state['last_mcp_model']["network_design"]["links"]
+                                    )
+                                    
+                                    # Run validation
+                                    validation_results = validator.validate_topology()
+                                    
+                                    # Display validation results
+                                    st.markdown("#### 📋 Pre-Deployment Validation")
+                                    if validation_results:
+                                        for result in validation_results:
+                                            if result["type"] == "error":
+                                                st.error(f"❌ {result['category']}: {result['message']}")
+                                            elif result["type"] == "warning":
+                                                st.warning(f"⚠️ {result['category']}: {result['message']}")
+                                            else:
+                                                st.info(f"ℹ️ {result['category']}: {result['message']}")
+                                    else:
+                                        st.success("✅ No validation issues found!")
+                                    
+                                    # Health check section
+                                    st.markdown("#### 🏥 Lab Health Status")
+                                    if 'last_created_lab_id' in st.session_state:
+                                        cml_manager = get_cml_manager()
+                                        if cml_manager:
+                                            health_results = validator.run_health_checks(cml_manager)
+                                            if health_results:
+                                                for result in health_results:
+                                                    if result["type"] == "error":
+                                                        st.error(f"❌ {result['category']}: {result['message']}")
+                                                    elif result["type"] == "warning":
+                                                        st.warning(f"⚠️ {result['category']}: {result['message']}")
+                                                    else:
+                                                        st.info(f"ℹ️ {result['category']}: {result['message']}")
+                                            else:
+                                                st.success("✅ All health checks passed!")
+                                        else:
+                                            st.warning("⚠️ CML connection not available for health checks")
+                                    else:
+                                        st.info("ℹ️ No lab deployed yet. Deploy a lab to run health checks.")
+                                else:
+                                    st.info("ℹ️ No topology loaded. Generate or load a topology first.")
         except Exception as e:
             st.error(f"❌ An error occurred: {str(e)}")
             st.error("Please try again with a different description.")

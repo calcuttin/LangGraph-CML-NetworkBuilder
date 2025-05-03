@@ -1,0 +1,158 @@
+{
+    "network_design": {
+        "devices": [
+            {
+                "name": "R1",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 100,
+                "config": "hostname R1\ninterface GigabitEthernet0/0\n ip address 10.0.0.1 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.21 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/2\n ip address 10.0.0.25 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "SW1",
+                "type": "switch",
+                "node_definition": "iosvl2",
+                "x": 300,
+                "y": 100,
+                "config": "hostname SW1\ninterface GigabitEthernet0/0\n ip address 10.0.0.2 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R2",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 500,
+                "y": 100,
+                "config": "hostname R2\ninterface GigabitEthernet0/0\n ip address 10.0.0.5 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.22 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/2\n ip address 10.0.0.29 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "SW2",
+                "type": "switch",
+                "node_definition": "iosvl2",
+                "x": 100,
+                "y": 300,
+                "config": "hostname SW2\ninterface GigabitEthernet0/0\n ip address 10.0.0.6 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R3",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 300,
+                "y": 300,
+                "config": "hostname R3\ninterface GigabitEthernet0/0\n ip address 10.0.0.9 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.26 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/2\n ip address 10.0.0.33 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "SW3",
+                "type": "switch",
+                "node_definition": "iosvl2",
+                "x": 500,
+                "y": 300,
+                "config": "hostname SW3\ninterface GigabitEthernet0/0\n ip address 10.0.0.10 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R4",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 100,
+                "y": 500,
+                "config": "hostname R4\ninterface GigabitEthernet0/0\n ip address 10.0.0.13 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.30 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/2\n ip address 10.0.0.37 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "SW4",
+                "type": "switch",
+                "node_definition": "iosvl2",
+                "x": 300,
+                "y": 500,
+                "config": "hostname SW4\ninterface GigabitEthernet0/0\n ip address 10.0.0.14 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "R5",
+                "type": "router",
+                "node_definition": "iosv",
+                "x": 500,
+                "y": 500,
+                "config": "hostname R5\ninterface GigabitEthernet0/0\n ip address 10.0.0.17 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/1\n ip address 10.0.0.34 255.255.255.252\n no shutdown\ninterface GigabitEthernet0/2\n ip address 10.0.0.38 255.255.255.252\n no shutdown"
+            },
+            {
+                "name": "SW5",
+                "type": "switch",
+                "node_definition": "iosvl2",
+                "x": 100,
+                "y": 700,
+                "config": "hostname SW5\ninterface GigabitEthernet0/0\n ip address 10.0.0.18 255.255.255.252\n no shutdown"
+            }
+        ],
+        "links": [
+            {
+                "endpoints": [
+                    "R1",
+                    "SW1"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R2",
+                    "SW2"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R3",
+                    "SW3"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R4",
+                    "SW4"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R5",
+                    "SW5"
+                ],
+                "link_type": "ethernet"
+            },
+            {
+                "endpoints": [
+                    "R1",
+                    "R2"
+                ],
+                "link_type": "bgp"
+            },
+            {
+                "endpoints": [
+                    "R1",
+                    "R3"
+                ],
+                "link_type": "bgp"
+            },
+            {
+                "endpoints": [
+                    "R2",
+                    "R4"
+                ],
+                "link_type": "bgp"
+            },
+            {
+                "endpoints": [
+                    "R3",
+                    "R5"
+                ],
+                "link_type": "bgp"
+            },
+            {
+                "endpoints": [
+                    "R4",
+                    "R5"
+                ],
+                "link_type": "bgp"
+            }
+        ]
+    }
+}

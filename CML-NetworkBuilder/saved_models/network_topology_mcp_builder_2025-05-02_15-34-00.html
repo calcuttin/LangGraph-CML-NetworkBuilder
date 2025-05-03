@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 700px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "lightblue", "fixed": true, "font": {"color": "black"}, "id": "legend_Router", "label": "Router", "physics": false, "shape": "box", "x": -250, "y": -350}, {"color": "lightgreen", "fixed": true, "font": {"color": "black"}, "id": "legend_Switch", "label": "Switch", "physics": false, "shape": "box", "x": -100, "y": -350}, {"color": "salmon", "fixed": true, "font": {"color": "black"}, "id": "legend_Firewall", "label": "Firewall", "physics": false, "shape": "box", "x": 50, "y": -350}, {"color": "lightgray", "fixed": true, "font": {"color": "black"}, "id": "legend_Server", "label": "Server", "physics": false, "shape": "box", "x": 200, "y": -350}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R1", "label": "R1", "shape": "ellipse", "size": 30, "title": "Device: R1 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.1 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.30 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.34 255.255.255.252\n  no shutdown", "x": 0, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R2", "label": "R2", "shape": "ellipse", "size": 30, "title": "Device: R2 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.2 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.5 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.46 255.255.255.252\n  no shutdown", "x": 200, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R3", "label": "R3", "shape": "ellipse", "size": 30, "title": "Device: R3 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.6 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.9 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.58 255.255.255.252\n  no shutdown", "x": 400, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R4", "label": "R4", "shape": "ellipse", "size": 30, "title": "Device: R4 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.10 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.13 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.70 255.255.255.252\n  no shutdown", "x": 600, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R5", "label": "R5", "shape": "ellipse", "size": 30, "title": "Device: R5 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.14 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.17 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.82 255.255.255.252\n  no shutdown", "x": 800, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R6", "label": "R6", "shape": "ellipse", "size": 30, "title": "Device: R6 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.18 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.21 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.94 255.255.255.252\n  no shutdown", "x": 1000, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R7", "label": "R7", "shape": "ellipse", "size": 30, "title": "Device: R7 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.22 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.25 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.106 255.255.255.252\n  no shutdown", "x": 1200, "y": 0}, {"color": "lightblue", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "R8", "label": "R8", "shape": "ellipse", "size": 30, "title": "Device: R8 (Router)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.26 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.29 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.118 255.255.255.252\n  no shutdown", "x": 1400, "y": 0}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS1", "label": "CS1", "shape": "box", "size": 30, "title": "Device: CS1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.33 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.37 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.41 255.255.255.252\n  no shutdown", "x": 0, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS2", "label": "CS2", "shape": "box", "size": 30, "title": "Device: CS2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.45 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.49 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.53 255.255.255.252\n  no shutdown", "x": 200, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS3", "label": "CS3", "shape": "box", "size": 30, "title": "Device: CS3 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.57 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.61 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.65 255.255.255.252\n  no shutdown", "x": 400, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS4", "label": "CS4", "shape": "box", "size": 30, "title": "Device: CS4 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.69 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.73 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.77 255.255.255.252\n  no shutdown", "x": 600, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS5", "label": "CS5", "shape": "box", "size": 30, "title": "Device: CS5 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.81 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.85 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.89 255.255.255.252\n  no shutdown", "x": 800, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS6", "label": "CS6", "shape": "box", "size": 30, "title": "Device: CS6 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.93 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.97 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.101 255.255.255.252\n  no shutdown", "x": 1000, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS7", "label": "CS7", "shape": "box", "size": 30, "title": "Device: CS7 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.105 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.109 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.113 255.255.255.252\n  no shutdown", "x": 1200, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "CS8", "label": "CS8", "shape": "box", "size": 30, "title": "Device: CS8 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.117 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/1\n  ip address 10.0.0.121 255.255.255.252\n  no shutdown\ninterface GigabitEthernet0/2\n  ip address 10.0.0.125 255.255.255.252\n  no shutdown", "x": 1400, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS1-1", "label": "AS1-1", "shape": "box", "size": 30, "title": "Device: AS1-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.38 255.255.255.252\n  no shutdown", "x": 1600, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS1-2", "label": "AS1-2", "shape": "box", "size": 30, "title": "Device: AS1-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.42 255.255.255.252\n  no shutdown", "x": 1800, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS2-1", "label": "AS2-1", "shape": "box", "size": 30, "title": "Device: AS2-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.50 255.255.255.252\n  no shutdown", "x": 2000, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS2-2", "label": "AS2-2", "shape": "box", "size": 30, "title": "Device: AS2-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.54 255.255.255.252\n  no shutdown", "x": 2200, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS3-1", "label": "AS3-1", "shape": "box", "size": 30, "title": "Device: AS3-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.62 255.255.255.252\n  no shutdown", "x": 2400, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS3-2", "label": "AS3-2", "shape": "box", "size": 30, "title": "Device: AS3-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.66 255.255.255.252\n  no shutdown", "x": 2600, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS4-1", "label": "AS4-1", "shape": "box", "size": 30, "title": "Device: AS4-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.74 255.255.255.252\n  no shutdown", "x": 2800, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS4-2", "label": "AS4-2", "shape": "box", "size": 30, "title": "Device: AS4-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.78 255.255.255.252\n  no shutdown", "x": 3000, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS5-1", "label": "AS5-1", "shape": "box", "size": 30, "title": "Device: AS5-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.86 255.255.255.252\n  no shutdown", "x": 3200, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS5-2", "label": "AS5-2", "shape": "box", "size": 30, "title": "Device: AS5-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.90 255.255.255.252\n  no shutdown", "x": 3400, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS6-1", "label": "AS6-1", "shape": "box", "size": 30, "title": "Device: AS6-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.98 255.255.255.252\n  no shutdown", "x": 3600, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS6-2", "label": "AS6-2", "shape": "box", "size": 30, "title": "Device: AS6-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.102 255.255.255.252\n  no shutdown", "x": 3800, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS7-1", "label": "AS7-1", "shape": "box", "size": 30, "title": "Device: AS7-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.110 255.255.255.252\n  no shutdown", "x": 4000, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS7-2", "label": "AS7-2", "shape": "box", "size": 30, "title": "Device: AS7-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.114 255.255.255.252\n  no shutdown", "x": 4200, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS8-1", "label": "AS8-1", "shape": "box", "size": 30, "title": "Device: AS8-1 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.122 255.255.255.252\n  no shutdown", "x": 4400, "y": 150}, {"color": "lightgreen", "fixed": {"x": true, "y": true}, "font": {"color": "black"}, "id": "AS8-2", "label": "AS8-2", "shape": "box", "size": 30, "title": "Device: AS8-2 (Switch)\ninterface GigabitEthernet0/0\n  ip address 10.0.0.126 255.255.255.252\n  no shutdown", "x": 4600, "y": 150}]);
+                  edges = new vis.DataSet([{"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R1", "label": "serial", "to": "R2", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R2", "label": "serial", "to": "R3", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R3", "label": "serial", "to": "R4", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R4", "label": "serial", "to": "R5", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R5", "label": "serial", "to": "R6", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R6", "label": "serial", "to": "R7", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R7", "label": "serial", "to": "R8", "width": 2}, {"arrows": "to", "dashes": true, "font": {"size": 12}, "from": "R8", "label": "serial", "to": "R1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS1", "label": "ethernet", "to": "R1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS1", "label": "ethernet", "to": "AS1-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS1", "label": "ethernet", "to": "AS1-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS2", "label": "ethernet", "to": "R2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS2", "label": "ethernet", "to": "AS2-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS2", "label": "ethernet", "to": "AS2-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS3", "label": "ethernet", "to": "R3", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS3", "label": "ethernet", "to": "AS3-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS3", "label": "ethernet", "to": "AS3-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS4", "label": "ethernet", "to": "R4", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS4", "label": "ethernet", "to": "AS4-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS4", "label": "ethernet", "to": "AS4-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS5", "label": "ethernet", "to": "R5", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS5", "label": "ethernet", "to": "AS5-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS5", "label": "ethernet", "to": "AS5-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS6", "label": "ethernet", "to": "R6", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS6", "label": "ethernet", "to": "AS6-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS6", "label": "ethernet", "to": "AS6-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS7", "label": "ethernet", "to": "R7", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS7", "label": "ethernet", "to": "AS7-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS7", "label": "ethernet", "to": "AS7-2", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS8", "label": "ethernet", "to": "R8", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS8", "label": "ethernet", "to": "AS8-1", "width": 2}, {"arrows": "to", "dashes": false, "font": {"size": 12}, "from": "CS8", "label": "ethernet", "to": "AS8-2", "width": 2}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"layout": {"improvedLayout": true}, "interaction": {"dragNodes": true, "zoomView": true, "hover": true}, "physics": {"stabilization": {"enabled": true, "iterations": 1000}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
