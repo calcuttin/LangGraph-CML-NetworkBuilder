@@ -1,141 +1,175 @@
-<p align="center">
-  <img src="./assets/graph2lab_logo.png" alt="Graph2Lab Logo" width="200"/>
-</p>
+# Graph2Lab: AI-Powered Network Lab Builder
 
-# 🧠🧪 Graph2Lab: Your AI-Powered Network Lab Assistant
+Graph2Lab helps you **build, validate, customize, and deploy** network labs using AI-generated topologies.
 
-![Python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python)
-![Streamlit](https://img.shields.io/badge/built_with-Streamlit-ff4b4b?logo=streamlit)
-![LangGraph](https://img.shields.io/badge/langgraph-integrated-blueviolet)
-![CML](https://img.shields.io/badge/cisco-modeling%20labs-lightgrey?logo=cisco)
-![License](https://img.shields.io/badge/license-MIT-green?logo=open-source-initiative)
-![Skippy Approved](https://img.shields.io/badge/AI-sidekick%20approved-blueviolet?style=flat-square&logo=github)
+![Graph2Lab Logo](assets/graph2lab_logo.png)
 
-*Graph2Lab* is an AI-powered assistant for building, customizing, and deploying network labs into Cisco Modeling Labs (CML). It combines LangGraph, Streamlit, and OpenAI to turn natural language topology requests into real-time, visualized, and deployable CML labs.
+## 🚀 Features
 
-Whether you're prototyping CCNA/CCNP topologies or managing enterprise-scale lab simulations, Graph2Lab helps streamline the process with automation, clarity, and control.
+- 🧠 **Natural Language Input**: Describe your desired network and let the AI generate the topology.
+- 🛠 **Interactive Editing**: Customize interface configs, IP addresses, and protocol settings.
+- 🧪 **Validation & Health Checks**: Instantly check for duplicate IPs, config errors, and lab health before and after deployment.
+- 🛰 **Protocol Support**: Configure Static, OSPF, EIGRP, and BGP protocols with interface-level control.
+- 💡 **Design Mode**: Offline mode lets you work with templates without needing CML access.
+- 📈 **Visual Tools**: Network topology viewer, flowchart diagrams, and summary tables.
+- 🚀 **One-Click Deployment**: Deploy your custom lab to Cisco Modeling Labs or queue it for later.
 
----
+## 🔄 Workflow
 
-## 🔧 Features
+Graph2Lab implements a dual-path workflow to generate network topologies:
 
-- ✍️ **Natural Language Topology Generator** using LangGraph AI Agent
-- 📚 **CCNA/CCNP Lab Templates** (Static, OSPF, EIGRP, VLANs, Multi-Site, etc.)
-- 🛠️ **Interactive Pre-Deployment Editor** for devices, IPs, VLANs
-- 🌐 **Visual Network Topology Renderer** using PyVis and vis.js
-- 🚀 **Push-to-CML** deployment with real-time lab status feedback
-- 💾 Save, reload, and edit topologies from disk
-- 🧪 Test CML connectivity inline
-
----
-
-## 📸 Screenshots
-
-| MCP ➝ CML Flowchart | Template Editing | Topology Visualization |
-|:--------------------|:-----------------|:------------------------|
-| ![flow](image.png) | ![editor](image.png) | ![topology](image.png) |
-
----
-
-## 🗂 Directory Structure
-
-```bash
-├── Frontend.py                # Main Streamlit app
-├── CMLConnector.py           # Handles interaction with CML server
-├── saved_models/             # Auto-saved and exported JSON topologies
-├── custom_templates/         # User-defined lab templates
-├── .env                      # Secrets (e.g., CML login, OpenAI key)
-├── README.md                 # This file
+```
+┌─────────────────┐
+│   User Input    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────┐
+│                                             │
+│  ┌───────────────┐         ┌──────────────┐ │
+│  │ Template Path │         │   Chat Path  │ │
+│  └───────┬───────┘         └──────┬───────┘ │
+│          │                        │         │
+│          ▼                        ▼         │
+│  ┌───────────────┐         ┌──────────────┐ │
+│  │Load Template  │         │LLM Topology  │ │
+│  │  Structure    │         │   Parser     │ │
+│  └───────┬───────┘         └──────┬───────┘ │
+│          │                        │         │
+│          ▼                        ▼         │
+│  ┌───────────────┐         ┌──────────────┐ │
+│  │ Ready-to-Use  │         │   Parser     │ │
+│  │   MCP Model   │         │  Success?    │ │
+│  └───────┬───────┘         └──────┬───────┘ │
+│          │                        │         │
+│          │        ┌───────────────┴─────┐   │
+│          │        │                     │   │
+│          │        ▼                     ▼   │
+│          │  ┌──────────────┐    ┌──────────────┐
+│          │  │ Pattern      │    │ Use Parser   │
+│          │  │ Detection    │    │ Output       │
+│          │  └──────┬───────┘    └──────┬───────┘
+│          │         │                   │
+│          │         ▼                   │
+│          │  ┌──────────────┐           │
+│          │  │ Generate     │           │
+│          │  │ Template     │           │
+│          │  └──────┬───────┘           │
+│          │         │                   │
+└────────────────────┼───────────────────┘
+                     │                   │
+                     ▼                   ▼
+         ┌────────────────────────────────────────┐
+         │        IP Address Assignment           │
+         └─────────────────┬──────────────────────┘
+                           │
+                           ▼
+         ┌────────────────────────────────────────┐
+         │  Protocol Configuration (OSPF/EIGRP)   │
+         └─────────────────┬──────────────────────┘
+                           │
+                           ▼
+         ┌────────────────────────────────────────┐
+         │  Interactive Device & Interface Editing │
+         └─────────────────┬──────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────┐
+│                                                     │
+│ ┌─────────────────────┐     ┌─────────────────────┐ │
+│ │ Topology            │     │ Pre-Deployment      │ │
+│ │ Visualization       │     │ Validation          │ │
+│ └─────────────────────┘     └─────────────────────┘ │
+│                                                     │
+└───────────────────────┬─────────────────────────────┘
+                        │
+                        ▼
+            ┌────────────────────────┐
+            │     Deploy to CML      │
+            └────────────┬───────────┘
+                         │
+                         ▼
+            ┌────────────────────────┐
+            │  Running Lab with      │
+            │  Health Monitoring     │
+            └────────────────────────┘
 ```
 
----
+### Workflow Explanation
 
-## ⚙️ Requirements
+1. **Input Methods**:
+   - **Template Path**: Choose from predefined network topologies
+   - **Chat Path**: Describe your network in natural language
 
-- Python 3.11+
-- Streamlit
-- LangGraph
-- LangChain
-- OpenAI (for LLM inference)
-- pyvis
-- httpx
-- dotenv
+2. **Topology Generation**:
+   - Templates are directly loaded as MCP models
+   - Chat descriptions are parsed by an LLM 
+   - Pattern detection provides fallback when parsing fails
 
-Install with:
+3. **Network Configuration**:
+   - IP addresses are automatically assigned
+   - Routing protocols (OSPF, EIGRP, BGP) are configured
+   - Interactive device and interface editing is available
 
-```bash
-pip install -r requirements.txt
-```
+4. **Validation & Deployment**:
+   - Pre-deployment validation catches configuration errors
+   - Interactive Plotly visualization shows the topology
+   - One-click deployment to Cisco Modeling Labs
+   - Health monitoring after deployment
 
-Or manually:
+## 🚦 Project Status
 
-```bash
-pip install streamlit langgraph langchain openai python-dotenv pyvis httpx
-```
+- **Version**: 3.0
+- **Phase**: Network Validation & Health Checks
 
----
+## 📋 Recent Updates
 
-## 🚀 Running the App
+- Added built-in network validation tools (duplicate IPs, device names, VLAN, routing, protocol config)
+- Added lab health check tab (lab state, node status, pre/post-deployment validation)
+- UI: New "Validation & Health" tab for real-time feedback
+- Foundation for automated connectivity tests (ping, traceroute, BGP neighbor checks)
+- Improved visualization with Plotly interactive network diagrams
 
-1. Clone the repo:
+## 🏗️ Next Steps
+
+- Automated connectivity and protocol tests (ping, traceroute, BGP neighbor checks)
+- Advanced topology and protocol validation
+- Traffic generation and simulation tools
+- Lab scheduling, snapshots, and resource monitoring
+- Enhanced documentation and learning tools
+- Collaboration and sharing features
+
+## 💻 Setup & Installation
+
+1. Clone this repository
+2. Set up a Python virtual environment:
    ```bash
-   git clone https://github.com/calcuttin/LangGraph-CML-NetworkBuilder.git
-   cd LangGraph-CML-NetworkBuilder
+   python -m venv MCP_ENV
+   source MCP_ENV/bin/activate  # On Windows: MCP_ENV\Scripts\activate
    ```
-
-2. Add your secrets to `.env`:
-   ```env
-   CML_USERNAME=your-cml-username
-   CML_PASSWORD=your-cml-password
-   CML_SERVER=https://your-cml-server
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Configure your CML environment in a `.env` file:
+   ```
+   CML_SERVER=your-cml-server
+   CML_USERNAME=your-username
+   CML_PASSWORD=your-password
    OPENAI_API_KEY=your-openai-key
    ```
-
-3. Launch:
+5. Run the application:
    ```bash
    streamlit run Frontend.py
    ```
 
----
+## 📚 Usage Examples
 
-## 🧠 How It Works
-
-1. You type a network request (e.g. "3 routers in a ring using OSPF").
-2. LangGraph interprets it and generates an MCP-compliant model.
-3. You can customize configs (hostnames, IPs, VLANs, etc.) in the table.
-4. Preview the topology visually.
-5. Push to CML — it creates the lab, nodes, interfaces, and starts the simulation.
-
----
-
-## 📚 Example Templates Included
-
-- `Hub and Spoke (3 Routers)`
-- `Full Mesh (STATIC)`
-- `Campus LAN (VLANs & RoS)`
-- `Full Mesh OSPF`
-- `Full Mesh EIGRP`
-- `Multi-Site WAN + LAN Mega-Lab (Multi-Area OSPF + PCs)`
-
----
-
-## 🔐 Security Note
-
-This app uses local environment variables to protect CML credentials and OpenAI keys. Never commit `.env` to version control.
-
----
+- "Create a network with 5 routers connected in a ring topology with OSPF"
+- "Build a VXLAN fabric with 2 spine switches and 4 leaf switches"
+- "Generate a hub and spoke WAN with 1 hub and 4 remote sites"
+- "Create a campus network with core-distribution-access layers and VLANs"
 
 ## 🤝 Contributing
 
-PRs welcome! Feature ideas include:
-- Dynamic interface assignment by dropdown
-- Visual diff for config changes
-- Export to Visio or NetBox format
-
----
-
-## 📜 License
-
-MIT © 2025 [Nicholas Calcutti](https://technicalcutti.tech)
-
----
+Contributions are welcome! Please feel free to submit a Pull Request.
