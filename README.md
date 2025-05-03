@@ -33,7 +33,7 @@ Whether you're prototyping CCNA/CCNP topologies or managing enterprise-scale lab
 
 | MCP ➝ CML Flowchart | Template Editing | Topology Visualization |
 |:--------------------|:-----------------|:------------------------|
-| ![flow](./assets/flowchart.png) | ![editor](./assets/editor.png) | ![topology](./assets/topology.png) |
+| ![flow](image.png) | ![editor](image.png) | ![topology](image.png) |
 
 ---
 
