@@ -5,13 +5,16 @@ import ipaddress
 import math
 import random
 
-def draw_network_topology_plotly(mcp_model, dark_mode=False):
+def draw_network_topology_plotly(mcp_model, dark_mode=False, layout_type='spring', node_status=None):
     """
-    Generate an interactive network topology diagram using Plotly, respecting dark/light mode.
+    Generate an interactive network topology diagram using Plotly, respecting dark/light mode,
+    layout choice, and showing node status.
     
     Args:
         mcp_model: Dictionary containing network design info with devices and links
         dark_mode: Boolean indicating if dark mode is enabled
+        layout_type: String specifying the layout algorithm ('spring', 'kamada_kawai', 'circular', 'shell')
+        node_status: Optional dictionary mapping node names to their status ('up', 'down', etc.)
     """
     # --- Theme Colors ---
     bg_color = '#1e1e1e' if dark_mode else '#ffffff'  # Dark gray or white
@@ -20,6 +23,11 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
     line_color = '#bbbbbb' if dark_mode else '#888888' # Lighter lines for dark mode
     hover_bg = '#333333' if dark_mode else '#ffffff'
     hover_font = '#ffffff' if dark_mode else '#000000'
+    status_colors = {
+        'up': '#28a745', # Green
+        'down': '#dc3545', # Red
+        'unknown': '#ffc107' # Yellow
+    }
 
     # Early safety check
     if not mcp_model or not isinstance(mcp_model, dict):
@@ -58,9 +66,11 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
             
         name = device.get("name", "Unnamed")
         dev_type = device.get("type", "router").lower()
+        # Get status (default to unknown if not provided)
+        status = (node_status or {}).get(name, 'unknown') 
         
         # Build comprehensive hover info
-        hover_info = f"<b>{name}</b> ({dev_type.title()})<br>"
+        hover_info = f"<b>{name}</b> ({dev_type.title()})<br><b>Status: {status.upper()}</b><br>"
         
         # Add interface information with proper HTML formatting
         interfaces = device.get("interfaces", [])
@@ -105,6 +115,7 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
         # Add node to graph with attributes
         G.add_node(name, 
                   type=dev_type,
+                  status=status, # Store status
                   hover_text=hover_info)
     
     # Add edges to the graph
@@ -145,18 +156,24 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
         st.warning("ℹ️ No valid network elements to display.")
         return None
     
-    # Create a better layout - choose the layout algorithm based on topology type
+    # --- Apply selected layout algorithm ---
     try:
         if len(G.nodes()) == 0: # Handle empty graph case
              pos = {}
-        elif len(G.edges()) / len(G.nodes()) > 1.5:  # Highly connected (like mesh)
-            pos = nx.spring_layout(G, k=1.5/math.sqrt(len(G.nodes())), iterations=50, seed=42)
-        elif any(d > 0.4 * len(G.nodes()) for n, d in G.degree()):  # Star-like with high degree nodes
-            pos = nx.kamada_kawai_layout(G)
-        else:  # Default for simple topologies
-            pos = nx.spring_layout(G, k=1.0/math.sqrt(len(G.nodes())), seed=42)
+        elif layout_type == 'kamada_kawai':
+             pos = nx.kamada_kawai_layout(G)
+        elif layout_type == 'circular':
+             pos = nx.circular_layout(G)
+        elif layout_type == 'shell':
+             pos = nx.shell_layout(G)
+        elif layout_type == 'spectral':
+             pos = nx.spectral_layout(G)
+        # Default to spring layout
+        else: 
+            k_val = 1.0 / math.sqrt(len(G.nodes())) if len(G.nodes()) > 0 else 1.0
+            pos = nx.spring_layout(G, k=k_val, seed=42)
     except Exception as e:
-        st.error(f"❌ Error creating graph layout: {str(e)}")
+        st.error(f"❌ Error creating graph layout ({layout_type}): {str(e)}")
         # Fallback to simple spring layout if possible
         try:
             pos = nx.spring_layout(G, seed=42)
@@ -173,12 +190,16 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
         "ext-server": "#CCCCCC"    # Light gray
     }
     
+    # --- Use more diverse Plotly symbols --- 
     node_shapes = {
         "router": "circle",
         "switch": "square",
         "firewall": "diamond",
         "server": "triangle-up",
-        "ext-server": "triangle-up"
+        "ext-server": "cross",
+        "pc": "circle-x", 
+        "host": "circle-dot",
+        "default": "circle" # Fallback symbol
     }
     
     # Create node traces by device type for better legend
@@ -196,7 +217,7 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
         
     for device_type in device_types:
         color = node_colors.get(device_type, "#808080")  # Gray as default
-        shape = node_shapes.get(device_type, "circle")   # Circle as default
+        shape = node_shapes.get(device_type, node_shapes["default"])
         
         node_traces[device_type] = go.Scatter(
             x=[],
@@ -215,17 +236,23 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
                 size=35,
                 color=color,
                 symbol=shape,
-                line=dict(color=text_color, width=1) # Border color based on mode
+                line=dict(color=text_color, width=1) # Border color initially based on theme
             ),
             textfont=dict(color=text_color, size=10), # Adjust text color
             textposition="bottom center"
         )
     
-    # Add nodes to the corresponding traces
+    # Add nodes to the corresponding traces and apply status styling
+    node_x_coords = {}
+    node_y_coords = {}
+    node_border_colors = {}
+    
     for node, attrs in G.nodes(data=True):
         if node not in pos: continue # Skip nodes without position
         x, y = pos[node]
         node_type = attrs.get('type', 'router')
+        status = attrs.get('status', 'unknown')
+        border_color = status_colors.get(status, status_colors['unknown'])
         
         # Get or create the trace for this node type
         if node_type not in node_traces:
@@ -233,7 +260,8 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
             fallback_trace_key = next(iter(node_traces), 'router') 
             if fallback_trace_key not in node_traces:
                  # If still no trace, create a default router trace
-                 node_traces['router'] = go.Scatter(x=[],y=[],text=[],mode='markers+text', name='Router', hoverinfo='text', marker=dict(size=35, color='#66B2FF'), textfont=dict(color=text_color, size=10), textposition='bottom center')
+                 node_traces['router'] = go.Scatter(x=[],y=[],text=[],mode='markers+text', name='Router', hoverinfo='text', marker=dict(size=35, color='#66B2FF', line=dict(width=2)), textfont=dict(color=text_color, size=10), textposition='bottom center')
+                 node_traces['router'].marker.line.color = status_colors['unknown'] # Set default border
             node_traces[node_type] = node_traces.get(fallback_trace_key).copy()
             node_traces[node_type].name = node_type.title() if isinstance(node_type, str) else 'Unknown'
             # Ensure copied trace attributes are lists
@@ -242,20 +270,24 @@ def draw_network_topology_plotly(mcp_model, dark_mode=False):
 
         trace = node_traces[node_type]
         
-        # Add node coordinates - ensure the trace attributes exist and are lists
-        if not hasattr(trace, 'x') or trace.x is None: trace.x = []
-        if not hasattr(trace, 'y') or trace.y is None: trace.y = []
+        # Store coordinates and border color for this node
+        node_x_coords.setdefault(node_type, []).append(x)
+        node_y_coords.setdefault(node_type, []).append(y)
+        node_border_colors.setdefault(node_type, []).append(border_color)
+        
+        # Add node label and hover text
         if not hasattr(trace, 'text') or trace.text is None: trace.text = []
         if not hasattr(trace, 'hovertext') or trace.hovertext is None: trace.hovertext = []
             
-        trace.x = list(trace.x) + [x]
-        trace.y = list(trace.y) + [y]
-        
-        # Add node label
         trace.text = list(trace.text) + [node]
-        
-        # Add hover text
         trace.hovertext = list(trace.hovertext) + [attrs.get('hover_text', node)]
+
+    # Assign collected coordinates and border colors to traces
+    for node_type, trace in node_traces.items():
+        trace.x = node_x_coords.get(node_type, [])
+        trace.y = node_y_coords.get(node_type, [])
+        trace.marker.line.color = node_border_colors.get(node_type, []) # Apply status colors to border
+        trace.marker.line.width = 2 # Make border visible
     
     # Create edge traces based on link types
     edge_types = {}

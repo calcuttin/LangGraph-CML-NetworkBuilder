@@ -1,0 +1,778 @@
+{
+    "network_design": {
+        "devices": [
+            {
+                "name": "Router1",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/0",
+                        "ip": "10.0.0.1",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/7",
+                        "ip": "10.0.0.29",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/8",
+                        "ip": "10.0.0.33",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/9",
+                        "ip": "10.0.0.37",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/10",
+                        "ip": "10.0.0.41",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/11",
+                        "ip": "10.0.0.45",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/12",
+                        "ip": "10.0.0.49",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch1",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/0",
+                        "ip": "10.0.0.2",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router2",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/1",
+                        "ip": "10.0.0.5",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/7",
+                        "ip": "10.0.0.30",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/13",
+                        "ip": "10.0.0.53",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/14",
+                        "ip": "10.0.0.57",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/15",
+                        "ip": "10.0.0.61",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/16",
+                        "ip": "10.0.0.65",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/17",
+                        "ip": "10.0.0.69",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch2",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/1",
+                        "ip": "10.0.0.6",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router3",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/2",
+                        "ip": "10.0.0.9",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/8",
+                        "ip": "10.0.0.34",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/13",
+                        "ip": "10.0.0.54",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/18",
+                        "ip": "10.0.0.73",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/19",
+                        "ip": "10.0.0.77",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/20",
+                        "ip": "10.0.0.81",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/21",
+                        "ip": "10.0.0.85",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch3",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/2",
+                        "ip": "10.0.0.10",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router4",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/3",
+                        "ip": "10.0.0.13",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/9",
+                        "ip": "10.0.0.38",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/14",
+                        "ip": "10.0.0.58",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/18",
+                        "ip": "10.0.0.74",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/22",
+                        "ip": "10.0.0.89",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/23",
+                        "ip": "10.0.0.93",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/24",
+                        "ip": "10.0.0.97",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch4",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/3",
+                        "ip": "10.0.0.14",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router5",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/4",
+                        "ip": "10.0.0.17",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/10",
+                        "ip": "10.0.0.42",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/15",
+                        "ip": "10.0.0.62",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/19",
+                        "ip": "10.0.0.78",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/22",
+                        "ip": "10.0.0.90",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/25",
+                        "ip": "10.0.0.101",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/26",
+                        "ip": "10.0.0.105",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch5",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/4",
+                        "ip": "10.0.0.18",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router6",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/5",
+                        "ip": "10.0.0.21",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch6"
+                    },
+                    {
+                        "name": "GigabitEthernet0/11",
+                        "ip": "10.0.0.46",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/16",
+                        "ip": "10.0.0.66",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/20",
+                        "ip": "10.0.0.82",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/23",
+                        "ip": "10.0.0.94",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/25",
+                        "ip": "10.0.0.102",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/27",
+                        "ip": "10.0.0.109",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch6",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/5",
+                        "ip": "10.0.0.22",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            },
+            {
+                "name": "Router7",
+                "type": "router",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/6",
+                        "ip": "10.0.0.25",
+                        "mask": "255.255.255.252",
+                        "link_to": "SiteSwitch7"
+                    },
+                    {
+                        "name": "GigabitEthernet0/12",
+                        "ip": "10.0.0.50",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router1"
+                    },
+                    {
+                        "name": "GigabitEthernet0/17",
+                        "ip": "10.0.0.70",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router2"
+                    },
+                    {
+                        "name": "GigabitEthernet0/21",
+                        "ip": "10.0.0.86",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router3"
+                    },
+                    {
+                        "name": "GigabitEthernet0/24",
+                        "ip": "10.0.0.98",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router4"
+                    },
+                    {
+                        "name": "GigabitEthernet0/26",
+                        "ip": "10.0.0.106",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router5"
+                    },
+                    {
+                        "name": "GigabitEthernet0/27",
+                        "ip": "10.0.0.110",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router6"
+                    }
+                ],
+                "node_definition": "csr1000v"
+            },
+            {
+                "name": "SiteSwitch7",
+                "type": "switch",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/6",
+                        "ip": "10.0.0.26",
+                        "mask": "255.255.255.252",
+                        "link_to": "Router7"
+                    }
+                ],
+                "node_definition": "iosvl2"
+            }
+        ],
+        "links": [
+            {
+                "endpoints": [
+                    "Router1",
+                    "SiteSwitch1"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.0/30",
+                "ips": [
+                    "10.0.0.1",
+                    "10.0.0.2"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "SiteSwitch2"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.4/30",
+                "ips": [
+                    "10.0.0.5",
+                    "10.0.0.6"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router3",
+                    "SiteSwitch3"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.8/30",
+                "ips": [
+                    "10.0.0.9",
+                    "10.0.0.10"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router4",
+                    "SiteSwitch4"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.12/30",
+                "ips": [
+                    "10.0.0.13",
+                    "10.0.0.14"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router5",
+                    "SiteSwitch5"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.16/30",
+                "ips": [
+                    "10.0.0.17",
+                    "10.0.0.18"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router6",
+                    "SiteSwitch6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.20/30",
+                "ips": [
+                    "10.0.0.21",
+                    "10.0.0.22"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router7",
+                    "SiteSwitch7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.24/30",
+                "ips": [
+                    "10.0.0.25",
+                    "10.0.0.26"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router2"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.28/30",
+                "ips": [
+                    "10.0.0.29",
+                    "10.0.0.30"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router3"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.32/30",
+                "ips": [
+                    "10.0.0.33",
+                    "10.0.0.34"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router4"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.36/30",
+                "ips": [
+                    "10.0.0.37",
+                    "10.0.0.38"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router5"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.40/30",
+                "ips": [
+                    "10.0.0.41",
+                    "10.0.0.42"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.44/30",
+                "ips": [
+                    "10.0.0.45",
+                    "10.0.0.46"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router1",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.48/30",
+                "ips": [
+                    "10.0.0.49",
+                    "10.0.0.50"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "Router3"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.52/30",
+                "ips": [
+                    "10.0.0.53",
+                    "10.0.0.54"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "Router4"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.56/30",
+                "ips": [
+                    "10.0.0.57",
+                    "10.0.0.58"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "Router5"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.60/30",
+                "ips": [
+                    "10.0.0.61",
+                    "10.0.0.62"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "Router6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.64/30",
+                "ips": [
+                    "10.0.0.65",
+                    "10.0.0.66"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router2",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.68/30",
+                "ips": [
+                    "10.0.0.69",
+                    "10.0.0.70"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router3",
+                    "Router4"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.72/30",
+                "ips": [
+                    "10.0.0.73",
+                    "10.0.0.74"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router3",
+                    "Router5"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.76/30",
+                "ips": [
+                    "10.0.0.77",
+                    "10.0.0.78"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router3",
+                    "Router6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.80/30",
+                "ips": [
+                    "10.0.0.81",
+                    "10.0.0.82"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router3",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.84/30",
+                "ips": [
+                    "10.0.0.85",
+                    "10.0.0.86"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router4",
+                    "Router5"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.88/30",
+                "ips": [
+                    "10.0.0.89",
+                    "10.0.0.90"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router4",
+                    "Router6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.92/30",
+                "ips": [
+                    "10.0.0.93",
+                    "10.0.0.94"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router4",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.96/30",
+                "ips": [
+                    "10.0.0.97",
+                    "10.0.0.98"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router5",
+                    "Router6"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.100/30",
+                "ips": [
+                    "10.0.0.101",
+                    "10.0.0.102"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router5",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.104/30",
+                "ips": [
+                    "10.0.0.105",
+                    "10.0.0.106"
+                ]
+            },
+            {
+                "endpoints": [
+                    "Router6",
+                    "Router7"
+                ],
+                "link_type": "ethernet",
+                "subnet": "10.0.0.108/30",
+                "ips": [
+                    "10.0.0.109",
+                    "10.0.0.110"
+                ]
+            }
+        ]
+    }
+}

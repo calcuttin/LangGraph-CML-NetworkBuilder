@@ -93,6 +93,31 @@ def parse_network_request(text: str) -> dict:
                     links.append({"endpoints": [f"Router{i+1}", f"Router{j+1}"], "link_type": "ethernet"})
         return {"devices": devices, "links": links}
 
+    # --- New: N sites connected via [protocol] (default to ring) ---
+    site_conn_proto = re.search(r'(\d+)\s+sites?\s+connected\s+via\s+([a-z0-9]+)', text)
+    if site_conn_proto:
+        n = int(site_conn_proto.group(1))
+        proto = site_conn_proto.group(2).upper()
+        for i in range(n):
+            router = {"name": f"Router{i+1}", "type": "router"}
+            switch = {"name": f"SiteSwitch{i+1}", "type": "switch"}
+            devices.append(router)
+            devices.append(switch)
+            links.append({"endpoints": [router["name"], switch["name"]], "link_type": "ethernet"})
+        # Connect routers in a ring
+        for i in range(n):
+            next_idx = (i + 1) % n
+            links.append({"endpoints": [f"Router{i+1}", f"Router{next_idx+1}"], "link_type": "ethernet"})
+        return {
+            "devices": devices,
+            "links": links,
+            "protocol": proto,
+            "sites": n,
+            "topology": "ring",
+            "routers_per_site": 1,
+            "switches_per_site": 1
+        }
+
     # --- Legacy: Explicit device names and connections ---
     device_types = {
         "router": ["router", "core router", "edge router", "wan router"],
@@ -139,14 +164,22 @@ def parse_network_request(text: str) -> dict:
     vlan_matches = re.findall(r'vlan\s*(\d+)', text)
     for vlan in vlan_matches:
         vlan_ids.add(vlan)
-    output = {
-        "devices": devices,
-        "links": links,
-    }
-    if protocol:
-        output["protocol"] = protocol
-    if vlan_ids:
-        output["vlans"] = list(vlan_ids)
-    if not devices or not links:
-        output["error"] = "Unable to parse enough topology information. Please include device names and connections."
+        
+    # Create output, prioritizing parsed devices/links but including protocol if detected
+    if devices and links:
+        output = {
+            "devices": devices,
+            "links": links,
+        }
+        if protocol:
+            output["protocol"] = protocol
+        if vlan_ids:
+            output["vlans"] = list(vlan_ids)
+    elif protocol:
+        output = {"protocol": protocol}
+        if vlan_ids:
+            output["vlans"] = list(vlan_ids)
+    else:
+        output = {"error": "Unable to parse enough topology information. Please include device names and connections."}
+
     return output 
